@@ -132,7 +132,7 @@ internal class Program
     {
         Console.WriteLine("Select a provider");
         Console.WriteLine(
-            "  --provider <the type> --source \"/path/to/local/file/to/upload/filename.ext\" --destpath \"/path/on/destination/server/filename.ext\"");
+            "  --provider <the type> --sourcepath \"/path/to/local/file/to/upload/filename.ext\" --destpath \"/path/on/destination/server/filename.ext\"");
         Console.WriteLine("  Available types:  sftp, azureblob, box");
         Console.WriteLine("  This tool defaults to uploading files.");
         Console.WriteLine("  To switch to downloads set --download");
