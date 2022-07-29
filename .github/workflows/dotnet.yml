@@ -7,10 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
+  linux-build:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
@@ -21,3 +19,56 @@ jobs:
       run: dotnet restore FileUpload.sln
     - name: Build
       run: dotnet build FileUpload.sln --no-restore
+    - name: Publish
+      run: dotnet publish -c Release -r linux-x64 -p:PublishReadyToRun=true --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux-x64
+        path: |
+          FileUpload/bin/Release/net6.0/linux-x64/publish
+        retention-days: 14
+
+  windows-build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore FileUpload.sln
+    - name: Build
+      run: dotnet build FileUpload.sln --no-restore
+    - name: Publish
+      run: dotnet publish -c Release -r win-x64 -p:PublishReadyToRun=true --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: win-x64
+        path: |
+          FileUpload/bin/Release/net6.0/win-x64/publish
+        retention-days: 14
+
+  mac-build:
+    runs-on: mac-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore FileUpload.sln
+    - name: Build
+      run: dotnet build FileUpload.sln --no-restore
+    - name: Publish
+      run: dotnet publish -c Release -r osx-x64 -p:PublishReadyToRun=true --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: osx-x64
+        path: |
+          FileUpload/bin/Release/net6.0/osx-x64/publish
+        retention-days: 14

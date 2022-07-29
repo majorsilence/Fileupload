@@ -10,6 +10,7 @@
         <RootNamespace>FileUpload</RootNamespace>
         <AssemblyName>FileUpload</AssemblyName>
         <StartupObject>FileUpload.Program</StartupObject>
+        <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Azure.Storage.Blobs" Version="12.13.0" />
