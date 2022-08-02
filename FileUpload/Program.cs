@@ -43,6 +43,7 @@ internal class Program
         // BOX
         var boxJsonConfigPath = string.Empty;
         var boxJsonConfigAsString = string.Empty;
+        bool boxPermitFileModification = false;
 
         if (args.Length <= 2)
         {
@@ -50,7 +51,7 @@ internal class Program
             Environment.Exit(0);
         }
 
-        for (var i = 0; i < args.Length - 1; i++)
+        for (var i = 0; i < args.Length; i++)
             if (args[i] == "--provider")
             {
                 provider = args[i + 1];
@@ -99,6 +100,10 @@ internal class Program
             {
                 download = true;
             }
+            else if (args[i] == "--box-permit-file-update")
+            {
+                boxPermitFileModification = true;
+            }
             else if (args[i] == "/?" || args[i] == "-help" || args[i] == "help" || args[i] == "--help")
             {
                 PrintHelp();
@@ -122,7 +127,7 @@ internal class Program
                 if (!string.IsNullOrWhiteSpace(boxJsonConfigPath))
                     boxJsonConfigAsString = File.ReadAllText(boxJsonConfigPath);
 
-                return new Providers.Box(boxJsonConfigAsString);
+                return new Providers.Box(boxJsonConfigAsString, boxPermitFileModification);
             default:
                 return null;
         }
@@ -150,6 +155,8 @@ internal class Program
         Console.WriteLine("box options");
         Console.WriteLine("  --boxjsonconfigpath \"<filepath to json config>\"");
         Console.WriteLine("  --boxjsonconfigstring \"<ready to use json string instead of filepath>\"");
+        Console.WriteLine("  --box-permit-file-update");
+        Console.WriteLine("      If a file exists with the same name in the destination folder then it will be overwritten");
         Console.WriteLine("");
         Console.WriteLine("Examples");
         Console.WriteLine("");

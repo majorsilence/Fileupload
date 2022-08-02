@@ -1,5 +1,6 @@
 using Box.V2;
 using Box.V2.Config;
+using Box.V2.Exceptions;
 using Box.V2.JWTAuth;
 using Box.V2.Models;
 
@@ -14,13 +15,13 @@ namespace FileUpload.Providers;
 public class Box : IFileProvider
 {
     private static string adminToken;
-    private static string userToken;
     private readonly string _jsonConfig;
+    private readonly bool _boxPermitFileModification;
 
-
-    public Box(string jsonConfig)
+    public Box(string jsonConfig, bool boxPermitFileModification)
     {
         _jsonConfig = jsonConfig;
+        _boxPermitFileModification = boxPermitFileModification;
     }
 
     private BoxClient client { get; set; }
@@ -45,15 +46,29 @@ public class Box : IFileProvider
             }
         }
 
-        await client.FilesManager.UploadAsync(new BoxFileRequest()
-            {
-                Name = name,
-                Parent = new BoxFolderRequest()
+        try
+        {
+            await client.FilesManager.UploadAsync(new BoxFileRequest()
                 {
-                    Id = folderId
-                }
-            },
-            input);
+                    Name = name,
+                    Parent = new BoxFolderRequest()
+                    {
+                        Id = folderId
+                    }
+                },
+                input);
+            return;
+        }
+        catch (BoxAPIException)
+        {
+            if (!_boxPermitFileModification)
+            {
+                throw;
+            }
+        }
+        // overwrite existing file
+        string fileId = await FindFileId(folderId, name, 0);
+        await client.FilesManager.UploadNewVersionAsync(name, fileId, input);
     }
 
     public async Task DownloadFileAsync(string path, Stream output)
@@ -101,6 +116,24 @@ public class Box : IFileProvider
         var foundId = results.Entries.FirstOrDefault(p =>
             string.Equals(p.Name, findSubFolderNamed, StringComparison.InvariantCultureIgnoreCase))?.Id;
         return foundId;
+    }
+
+    private async Task<string> FindFileId(string folderId, string fileName, int page)
+    {
+        if (page > 10)
+        {
+            throw new Exception("File not found");
+        }
+
+        var results = await client.FoldersManager.GetFolderItemsAsync(folderId, 500, page * 500);
+        var found = results.Entries.FirstOrDefault(p =>
+            string.Equals(p.Name, fileName, StringComparison.InvariantCultureIgnoreCase));
+        if (found == null)
+        {
+            return await FindFileId(folderId, fileName, page + 1);
+        }
+
+        return found.Id;
     }
 
     private async Task LoginAsync()
