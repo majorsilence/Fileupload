@@ -36,13 +36,26 @@ public class Box : IFileProvider
         var folders = split.Where(p => !string.Equals(p, name) && !string.IsNullOrWhiteSpace(p)).ToArray();
 
         // 0 starts from the base folder that the credentials have access
-        var folderId = "0";
+        var parentId = "0";
         foreach (var folder in folders)
         {
-            folderId = await FindFolderId(folderId, folder);
+            string folderId = await FindFolderId(parentId, folder);
             if (string.IsNullOrWhiteSpace(folderId))
             {
-                throw new Exception("Folder not found");
+                
+                var folderParams = new BoxFolderRequest()
+                {
+                    Name = folder,
+                    Parent = new BoxRequestEntity()
+                    {
+                        Id = parentId
+                    }
+                };
+                await client.FoldersManager.CreateAsync(folderParams);
+            }
+            else
+            {
+                parentId = folderId;
             }
         }
 
@@ -53,7 +66,7 @@ public class Box : IFileProvider
                     Name = name,
                     Parent = new BoxFolderRequest()
                     {
-                        Id = folderId
+                        Id = parentId
                     }
                 },
                 input);
@@ -67,7 +80,7 @@ public class Box : IFileProvider
             }
         }
         // overwrite existing file
-        string fileId = await FindFileId(folderId, name, 0);
+        string fileId = await FindFileId(parentId, name, 0);
         await client.FilesManager.UploadNewVersionAsync(name, fileId, input);
     }
 
