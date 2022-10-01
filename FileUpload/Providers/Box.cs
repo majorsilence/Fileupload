@@ -51,7 +51,8 @@ public class Box : IFileProvider
                         Id = parentId
                     }
                 };
-                await client.FoldersManager.CreateAsync(folderParams);
+                var createResult = await client.FoldersManager.CreateAsync(folderParams);
+                parentId = createResult.Id;
             }
             else
             {
