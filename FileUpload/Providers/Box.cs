@@ -42,7 +42,6 @@ public class Box : IFileProvider
             string folderId = await FindFolderId(parentId, folder);
             if (string.IsNullOrWhiteSpace(folderId))
             {
-                
                 var folderParams = new BoxFolderRequest()
                 {
                     Name = folder,
@@ -62,24 +61,35 @@ public class Box : IFileProvider
 
         try
         {
-            await client.FilesManager.UploadAsync(new BoxFileRequest()
+            await Retry.DoAsync(
+                action: async () =>
                 {
-                    Name = name,
-                    Parent = new BoxFolderRequest()
-                    {
-                        Id = parentId
-                    }
+                    await client.FilesManager.UploadAsync(new BoxFileRequest()
+                        {
+                            Name = name,
+                            Parent = new BoxFolderRequest()
+                            {
+                                Id = parentId
+                            }
+                        },
+                        input);
                 },
-                input);
+                retryInterval: TimeSpan.FromSeconds(2), 
+                maxAttemptCount: 3
+            );
             return;
         }
-        catch (BoxAPIException)
+        catch (BoxAPIException e)
         {
             if (!_boxPermitFileModification)
             {
                 throw;
             }
+
+            await Console.Error.WriteLineAsync($"Failed to upload file {path}.");
+            await Console.Error.WriteLineAsync(e.Message);
         }
+
         // overwrite existing file
         string fileId = await FindFileId(parentId, name, 0);
         await client.FilesManager.UploadNewVersionAsync(name, fileId, input);
