@@ -79,7 +79,7 @@ public class Box : IFileProvider
             );
             return;
         }
-        catch (BoxAPIException e)
+        catch(Exception e)
         {
             if (!_boxPermitFileModification)
             {
@@ -91,6 +91,7 @@ public class Box : IFileProvider
         }
 
         // overwrite existing file
+        Console.WriteLine($"Attempting to upload new version of {name}");
         string fileId = await FindFileId(parentId, name, 0);
         await client.FilesManager.UploadNewVersionAsync(name, fileId, input);
     }
