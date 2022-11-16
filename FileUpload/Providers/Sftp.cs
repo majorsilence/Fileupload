@@ -3,24 +3,18 @@
 namespace FileUpload.Providers;
 
 /// <summary>
-///     SSH file transfer protocol
+/// SSH file transfer protocol
 /// </summary>
 public class Sftp : IFileProvider
 {
-    private readonly string host;
-    private readonly string password;
-    private readonly int port;
-    private readonly string username;
     private SftpClient client;
     private bool disposed;
-    private bool isLoggedIn;
 
     public Sftp(string host, int port, string username, string password)
     {
-        this.host = host;
-        this.port = port;
-        this.username = username;
-        this.password = password;
+        client = new SftpClient(host, port, username, password);
+        client.ConnectionInfo.RetryAttempts = 3;
+        client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(60);
     }
 
     public Task DownloadFileAsync(string path, Stream output)
@@ -43,24 +37,22 @@ public class Sftp : IFileProvider
 
     private void DownloadFile(string path, Stream output)
     {
-        Login();
+        if (!client.IsConnected)
+        {
+            client.Connect();
+        }
+
         client.DownloadFile(path, output);
     }
 
     private void UploadFile(string path, Stream input)
     {
-        Login();
+        if (!client.IsConnected)
+        {
+            client.Connect();
+        }
+
         client.UploadFile(input, path);
-    }
-
-    private void Login()
-    {
-        if (isLoggedIn) return;
-
-        client = new SftpClient(host, port, username, password);
-        client.Connect();
-
-        isLoggedIn = true;
     }
 
     protected virtual void Dispose(bool disposing)
@@ -69,11 +61,10 @@ public class Sftp : IFileProvider
             return;
 
         if (disposing)
-            if (client != null)
-            {
-                if (client.IsConnected) client.Disconnect();
-                client.Dispose();
-            }
+        {
+            if (client.IsConnected) client.Disconnect();
+            client.Dispose();
+        }
 
         disposed = true;
     }
