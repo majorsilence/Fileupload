@@ -11,9 +11,9 @@
         <AssemblyName>FileUpload</AssemblyName>
         <StartupObject>FileUpload.Program</StartupObject>
         <PublishTrimmed>true</PublishTrimmed>
-        <Version>1.0.7</Version>
-        <AssemblyVersion>1.0.7</AssemblyVersion>
-        <FileVersion>1.0.7</FileVersion>
+        <Version>1.0.8</Version>
+        <AssemblyVersion>1.0.8</AssemblyVersion>
+        <FileVersion>1.0.8</FileVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
