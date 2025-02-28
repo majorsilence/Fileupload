@@ -32,6 +32,9 @@ internal class Program
         sourcePath = string.Empty;
         destPath = string.Empty;
         download = false;
+
+        bool verbose = false;
+
         // SFTP
         var sftpUsername = string.Empty;
         var sftpPassword = string.Empty;
@@ -104,6 +107,10 @@ internal class Program
             {
                 boxPermitFileModification = true;
             }
+            else if (args[i] == "--verbose")
+            {
+                verbose = true;
+            }
             else if (args[i] == "/?" || args[i] == "-help" || args[i] == "help" || args[i] == "--help")
             {
                 PrintHelp();
@@ -127,7 +134,7 @@ internal class Program
                 if (!string.IsNullOrWhiteSpace(boxJsonConfigPath))
                     boxJsonConfigAsString = File.ReadAllText(boxJsonConfigPath);
 
-                return new Providers.Box(boxJsonConfigAsString, boxPermitFileModification);
+                return new Providers.Box(boxJsonConfigAsString, boxPermitFileModification, verbose);
             default:
                 return null;
         }

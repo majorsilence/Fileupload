@@ -17,11 +17,13 @@ public class Box : IFileProvider
     private static string adminToken;
     private readonly string _jsonConfig;
     private readonly bool _boxPermitFileModification;
+    private readonly bool _verbose;
 
-    public Box(string jsonConfig, bool boxPermitFileModification)
+    public Box(string jsonConfig, bool boxPermitFileModification, bool verbose)
     {
         _jsonConfig = jsonConfig;
         _boxPermitFileModification = boxPermitFileModification;
+        _verbose = verbose;
     }
 
     private BoxClient client { get; set; }
@@ -86,12 +88,18 @@ public class Box : IFileProvider
                 throw;
             }
 
-            await Console.Error.WriteLineAsync($"Failed to upload file {path}.");
-            await Console.Error.WriteLineAsync(e.Message);
+            if (_verbose)
+            {
+                await Console.Error.WriteLineAsync($"Failed to upload file {path}.");
+                await Console.Error.WriteLineAsync(e.Message);
+            }        
         }
 
         // overwrite existing file
-        Console.WriteLine($"Attempting to upload new version of {name}");
+        if (_verbose)
+        {
+            Console.WriteLine($"File exists, uploading a new version of {name}");
+        }
         string fileId = await FindFileId(parentId, name, 0);
         await client.FilesManager.UploadNewVersionAsync(name, fileId, input);
     }
