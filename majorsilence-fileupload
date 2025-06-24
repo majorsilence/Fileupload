@@ -1,0 +1,4 @@
+#!/bin/sh
+/opt/majorsilence/fileupload/FileUpload "$@"
+rc=$?
+exit $rc
