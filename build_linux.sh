@@ -4,7 +4,7 @@ VERSION=$(cat FileUpload/FileUpload.csproj | grep "<Version>" | sed 's/[^0-9.]*/
 
 dotnet restore FileUpload.sln
 dotnet build -c Release FileUpload.sln --no-restore
-dotnet publish -c Release -r linux-x64 -p:PublishReadyToRun=true --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true
+dotnet publish -c Release -r linux-x64 -p:PublishReadyToRun=true --self-contained true
 
 rm -rf /build/linux
 mkdir -p build/linux/opt/majorsilence/fileupload
