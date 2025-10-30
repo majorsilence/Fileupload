@@ -14,7 +14,7 @@
         <FileVersion>1.0.10</FileVersion>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Azure.Storage.Blobs" Version="12.24.1" />
+        <PackageReference Include="Azure.Storage.Blobs" Version="12.26.0" />
         <PackageReference Include="SSH.NET" Version="2025.1.0" />
         <PackageReference Include="Box.V2.Core" Version="5.8.0" />
     </ItemGroup>
