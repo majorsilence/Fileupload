@@ -85,7 +85,7 @@ jobs:
     - name: Get version
       id: get_version
       run: |
-        VERSION=$(grep -oP '(?<=<Version>)[^<]+' FileUpload/FileUpload.csproj)
+        VERSION=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' FileUpload/FileUpload.csproj)
         echo "version=$VERSION" >> $GITHUB_OUTPUT
     - name: Restore dependencies
       run: dotnet restore FileUpload.sln
