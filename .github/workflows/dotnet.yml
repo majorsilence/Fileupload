@@ -25,14 +25,14 @@ jobs:
       with:
         name: linux-x64
         path: |
-          FileUpload/bin/Release/net10.0/linux-x64
+          build/output/linux-x64
         retention-days: 1
     - name: Archive artifacts arm64 linux
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
       with:
         name: linux-arm64
         path: |
-          FileUpload/bin/Release/net10.0/linux-arm64
+          build/output/linux-arm64
         retention-days: 1
     - name: Archive Self Contained Debian Linux Client
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
@@ -55,13 +55,13 @@ jobs:
     - name: Build
       run: dotnet build FileUpload.sln --no-restore
     - name: Publish
-      run: dotnet publish -c Release -r win-x64 --self-contained true
+      run: dotnet publish -c Release -r win-x64 --self-contained true --output ./build/output/win-x64
     - name: Archive artifacts
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
       with:
         name: win-x64
         path: |
-          FileUpload/bin/Release/net10.0/win-x64
+          build/output/win-x64
         retention-days: 1
 
   mac-build:
@@ -77,11 +77,11 @@ jobs:
     - name: Build
       run: dotnet build FileUpload.sln --no-restore
     - name: Publish
-      run: dotnet publish -c Release -r osx-arm64 --self-contained true
+      run: dotnet publish -c Release -r osx-arm64 --self-contained true --output ./build/output/osx-arm64
     - name: Archive artifacts
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
       with:
         name: osx-arm64
         path: |
-          FileUpload/bin/Release/net10.0/osx-arm64
+          build/output/osx-arm64
         retention-days: 1
