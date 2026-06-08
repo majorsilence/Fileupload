@@ -47,6 +47,9 @@ internal class Program
         var boxJsonConfigPath = string.Empty;
         var boxJsonConfigAsString = string.Empty;
         bool boxPermitFileModification = false;
+        // S3 compatible
+        var s3ConnectionString = string.Empty;
+        var s3Bucket = string.Empty;
 
         if (args.Length <= 2)
         {
@@ -111,6 +114,14 @@ internal class Program
             {
                 verbose = true;
             }
+            else if (args[i] == "--s3-connectionstring")
+            {
+                s3ConnectionString = args[i + 1];
+            }
+            else if (args[i] == "--s3-bucket")
+            {
+                s3Bucket = args[i + 1];
+            }
             else if (args[i] == "/?" || args[i] == "-help" || args[i] == "help" || args[i] == "--help")
             {
                 PrintHelp();
@@ -135,6 +146,10 @@ internal class Program
                     boxJsonConfigAsString = File.ReadAllText(boxJsonConfigPath);
 
                 return new Providers.Box(boxJsonConfigAsString, boxPermitFileModification, verbose);
+            case "minio":
+            case "s3":
+                // Expecting connection string like: endpoint=play.min.io;accesskey=KEY;secretkey=SECRET;secure=true;region=us-east-1
+                return new S3MinioProvider(s3ConnectionString, s3Bucket);
             default:
                 return null;
         }
@@ -145,7 +160,7 @@ internal class Program
         Console.WriteLine("Select a provider");
         Console.WriteLine(
             "  --provider <the type> --sourcepath \"/path/to/local/file/to/upload/filename.ext\" --destpath \"/path/on/destination/server/filename.ext\"");
-        Console.WriteLine("  Available types:  sftp, azureblob, box");
+        Console.WriteLine("  Available types:  sftp, azureblob, box, minio, s3");
         Console.WriteLine("  This tool defaults to uploading files.");
         Console.WriteLine("  To switch to downloads set --download");
         Console.WriteLine("");
@@ -164,6 +179,11 @@ internal class Program
         Console.WriteLine("  --boxjsonconfigstring \"<ready to use json string instead of filepath>\"");
         Console.WriteLine("  --box-permit-file-update");
         Console.WriteLine("      If a file exists with the same name in the destination folder then it will be overwritten");
+        Console.WriteLine("");
+        Console.WriteLine("s3 options");
+        Console.WriteLine("  --s3-connectionstring \"endpoint=play.min.io;accesskey=KEY;secretkey=SECRET;secure=true;region=us-east-1\"");
+        Console.WriteLine("  --s3-bucket \"<bucket-name>\"");
+        Console.WriteLine("  region defaults to us-east-1 if omitted");
         Console.WriteLine("");
         Console.WriteLine("Examples");
         Console.WriteLine("");
