@@ -18,26 +18,31 @@ jobs:
       uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7  # v5.2.0
       with:
         dotnet-version: 10.0.x
+    - name: Get version
+      id: get_version
+      run: |
+        VERSION=$(grep -oP '(?<=<Version>)[^<]+' FileUpload/FileUpload.csproj)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
     - name: Build
       run: chmod +x ./build_linux.sh && ./build_linux.sh
     - name: Archive artifacts x64 linux
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
       with:
-        name: linux-x64
+        name: FileUpload-${{ steps.get_version.outputs.version }}-linux-x64
         path: |
           build/output/linux-x64
         retention-days: 1
     - name: Archive artifacts arm64 linux
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
       with:
-        name: linux-arm64
+        name: FileUpload-${{ steps.get_version.outputs.version }}-linux-arm64
         path: |
           build/output/linux-arm64
         retention-days: 1
     - name: Archive Self Contained Debian Linux Client
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
       with:
-        name: linux-x64-client-deb
+        name: FileUpload-${{ steps.get_version.outputs.version }}-linux-x64-client-deb
         path: |
           **/**/*.deb
         retention-days: 1
@@ -50,6 +55,11 @@ jobs:
       uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7  # v5.2.0
       with:
         dotnet-version: 10.0.x
+    - name: Get version
+      id: get_version
+      run: |
+        $VERSION = (Select-String -Path FileUpload/FileUpload.csproj -Pattern '<Version>([^<]+)</Version>').Matches[0].Groups[1].Value
+        echo "version=$VERSION" >> $env:GITHUB_OUTPUT
     - name: Restore dependencies
       run: dotnet restore FileUpload.sln
     - name: Build
@@ -59,7 +69,7 @@ jobs:
     - name: Archive artifacts
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
       with:
-        name: win-x64
+        name: FileUpload-${{ steps.get_version.outputs.version }}-win-x64
         path: |
           build/output/win-x64
         retention-days: 1
@@ -72,6 +82,11 @@ jobs:
       uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7  # v5.2.0
       with:
         dotnet-version: 10.0.x
+    - name: Get version
+      id: get_version
+      run: |
+        VERSION=$(grep -oP '(?<=<Version>)[^<]+' FileUpload/FileUpload.csproj)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
     - name: Restore dependencies
       run: dotnet restore FileUpload.sln
     - name: Build
@@ -81,7 +96,7 @@ jobs:
     - name: Archive artifacts
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
       with:
-        name: osx-arm64
+        name: FileUpload-${{ steps.get_version.outputs.version }}-osx-arm64
         path: |
           build/output/osx-arm64
         retention-days: 1
